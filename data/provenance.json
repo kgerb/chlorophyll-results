@@ -1,0 +1,45 @@
+{
+  "snapshot": "2026-10-13",
+  "analysis_ready": false,
+  "source_repository": "kgerb/LeafH2O (private research repository)",
+  "inputs": {
+    "chlorophyll/04_analysis/results/valid_dates/20261013_65cm/paired_observations.csv": "fda918f4318ed3c27a51d8f595ce64ae470b05ee9ba06ba7f09b39e175ec3132",
+    "chlorophyll/04_analysis/results/valid_dates/20261013_65cm/group_correlations.csv": "3ede3be36a9a219b9475b59c598423bdaebd4417edae82ea4c3f6685584369b4",
+    "chlorophyll/04_analysis/results/valid_dates/20261013_65cm/conditional_bootstrap.csv": "3b700036ba0716e5b1b004fc50287bed0c0469b4f51309af48f162ce79cb9818",
+    "chlorophyll/04_analysis/results/valid_dates/20261013_65cm/validation.json": "90f76092acae2fd75b373fadf176c4b124c4b48feab1d02cd885231d22eb3ec1",
+    "chlorophyll/04_analysis/results/valid_dates/20261013_65cm/manifest.json": "a7b170e8ff1d1b1fe0fe6c2c0ba253b5911b2db196f9c5f306cceda9e8613e3b",
+    "chlorophyll/annual_meeting26/audit/2026-06-18_display.npz": "39ce10114f8d772ee5faa88222c82c491a600fa24627a37851760d3a20a68304",
+    "chlorophyll/04_analysis/config/current_analysis.json": "d63e014e8f6fd9529cdaf101d563cbfe028c36a1dc4f4268720b7872cdb804d2",
+    "chlorophyll/04_analysis/showcase/build_data.py": "290f7f1542a79760307e3ac01ca1161482f8ee5cb50ad49ca7ced30976eedd21"
+  },
+  "published_files": {
+    "data/canopy.json": "1f909c76f3e70416ebf3dff9388991d33716d69c32363d22be046c0efa19c7df",
+    "data/correlations.csv": "e2122787fac9ee4d260dfa5f2596846f03144cccabb8a808126257d9b7cedb94",
+    "data/observations.csv": "ff9d9f6f8374f13efa8f37a8f918af3b589539609214b831c9d3a9d190d1ee1c",
+    "data/results.json": "20209b52b78538e92576cdf50ba04a72abd94937e99a84e9b536f30204995fc7"
+  },
+  "exact_date_pairs": 109,
+  "locations": 23,
+  "states": [
+    "baseline",
+    "default_structure",
+    "no_wood",
+    "default_both"
+  ],
+  "excluded_flight_dates": [
+    "2026-03-20"
+  ],
+  "excluded_field_dates": [
+    "2026-05-26"
+  ],
+  "cube_size_cm": 65,
+  "cloud_display_seed": 20261013,
+  "cloud_display_points": 14000,
+  "independent_checks": "All 12 tower/state Pearson coefficients and date-adjusted coefficients reconstructed from published rows; shared cohorts and channel support checked.",
+  "limitations": [
+    "Diagnostic associations; no validated prediction.",
+    "Full-site alignment and independent material accuracy remain open.",
+    "Conditional bootstrap ranges resample location histories, not independent trees; exclude alignment, field-selection and model uncertainty.",
+    "Position provenance uses September observations except the approved Douglas dt24wg May FIX exception."
+  ]
+}

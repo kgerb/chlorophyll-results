@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#203b2f" />
+    <meta
+      name="description"
+      content="Explore LeafH2O's current chlorophyll research: real canopy LiDAR, field measurements, and preliminary results across three forest towers."
+    />
+    <meta property="og:title" content="LeafH2O · Chlorophyll, in a new light" />
+    <meta
+      property="og:description"
+      content="A visual field note on two-colour LiDAR and chlorophyll. Explore the evidence from Beech, Douglas and Mixed forest towers."
+    />
+    <title>LeafH2O — Chlorophyll, in a new light</title>
+    <link rel="icon" href="./assets/leaf.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="header wrap">
+      <a class="brand" href="#" aria-label="LeafH2O home"
+        ><img
+          src="./assets/leaf.svg"
+          alt=""
+          width="30"
+          height="30"
+        />LeafH<span>2</span>O<span class="brand-tag"
+          >FIELD NOTES / 2026</span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#approach">The approach</a><a href="#results">The results</a
+        ><a class="nav-contact" href="#people"
+          >Meet the researchers <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="status-dot"></span> CHLOROPHYLL RESEARCH · LEAFH2O
+          </div>
+          <h1 id="hero-title">Chlorophyll,<br />in a <em>new light.</em></h1>
+          <p class="intro">
+            What can laser light tell us about the chlorophyll in a forest
+            canopy?
+          </p>
+          <p class="hero-detail">
+            We compare two-colour LiDAR with field measurements, following the
+            season across three forest towers. Here is what the current evidence
+            shows.
+          </p>
+          <a class="button" href="#results"
+            >Explore the findings <span aria-hidden="true">↗</span></a
+          >
+          <div class="snapshot">
+            <span>RESEARCH SNAPSHOT</span
+            ><time datetime="2026-10-13">13 October 2026</time
+            ><span class="preliminary">Preliminary findings</span>
+          </div>
+        </div>
+        <figure class="canopy-panel">
+          <div class="canopy-label">
+            <span
+              ><span class="live-dot"></span> A CLOSER LOOK AT THE CANOPY</span
+            ><span>01 / BEECH</span>
+          </div>
+          <canvas
+            id="canopy"
+            role="img"
+            aria-label="Actual sampled LiDAR returns around the Beech tower on 18 June 2026. Orange marks geometry-selected structures, lilac marks predicted wood, and pale green marks remaining returns."
+            tabindex="0"
+          ></canvas>
+          <div class="canopy-loading" id="cloud-status">
+            Loading the real point-cloud sample…
+          </div>
+          <div class="cloud-legend">
+            <span><i class="swatch remaining"></i>Remaining</span
+            ><span><i class="swatch structure"></i>Structure</span
+            ><span><i class="swatch wood"></i>Predicted wood</span>
+          </div>
+          <div
+            class="cloud-controls"
+            role="group"
+            aria-label="Point-cloud cleaning view"
+          >
+            <button class="active" data-cloud="all" aria-pressed="true">
+              All returns</button
+            ><button data-cloud="structure" aria-pressed="false">
+              No structures</button
+            ><button data-cloud="both" aria-pressed="false">
+              No structures / wood
+            </button>
+          </div>
+          <figcaption>
+            <span>18 JUN 2026 · 14,000 sampled returns</span
+            ><span>Drag or use ← → to rotate</span>
+          </figcaption>
+        </figure>
+      </section>
+      <div class="fact-strip wrap" aria-label="Study overview">
+        <div>
+          <strong>3</strong
+          ><span>forest towers<br />Beech · Douglas · Mixed</span>
+        </div>
+        <div>
+          <strong>23</strong
+          ><span>sampling locations<br />with supported comparisons</span>
+        </div>
+        <div>
+          <strong>109</strong
+          ><span>paired observations<br />field and LiDAR on the same day</span>
+        </div>
+        <div>
+          <strong>65<span>cm</span></strong
+          ><span>sample cubes<br />one fixed size across comparisons</span>
+        </div>
+      </div>
+      <section
+        class="section wrap"
+        id="approach"
+        aria-labelledby="approach-title"
+      >
+        <div class="section-kicker">01 — THE APPROACH</div>
+        <div class="section-heading">
+          <h2 id="approach-title">Two measurements.<br />One canopy.</h2>
+          <p>
+            Leaves interact with light. We bring together a measurement made on
+            sampled foliage and a laser measurement of its surroundings, then
+            ask whether they vary together.
+          </p>
+        </div>
+        <div class="measurement-grid">
+          <article class="measurement">
+            <span class="small-label">ON THE FOLIAGE</span>
+            <h3>A field chlorophyll signal</h3>
+            <p>
+              A CCM-300 instrument measures the ratio of fluorescence at 735 and
+              700 nm. This chlorophyll fluorescence ratio, or
+              <strong>CFR</strong>, is our field comparison.
+            </p>
+            <div class="formula">
+              <span>735 <small>nm</small></span
+              ><span class="divider">/</span><span>700 <small>nm</small></span
+              ><span class="formula-label">FLUORESCENCE</span>
+            </div>
+            <p class="note">
+              CFR is a measured optical signal. Converting it to chlorophyll
+              concentration requires separate validation, especially for
+              conifers.
+            </p>
+          </article>
+          <article class="measurement">
+            <span class="small-label">FROM THE LASER</span>
+            <h3>A two-colour reflectance ratio</h3>
+            <p>
+              The LiDAR records reflected laser light in two channels. Within
+              each sample cube, we divide the mean calibrated reflectance at
+              1064 nm by the mean at 532 nm.
+            </p>
+            <div class="formula">
+              <span>1064 <small>nm</small></span
+              ><span class="divider">/</span><span>532 <small>nm</small></span
+              ><span class="formula-label">MEAN REFLECTANCE</span>
+            </div>
+            <p class="note">
+              These are channel averages from nearby returns, not two
+              measurements of the exact same leaf or a point-by-point ratio.
+            </p>
+          </article>
+        </div>
+        <div class="workflow" aria-label="Research workflow">
+          <article>
+            <span>01</span>
+            <h3>Bring flights together</h3>
+            <p>
+              Place calibrated surveys in a common frame and inspect their
+              agreement.
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Identify tower structures</h3>
+            <p>
+              Use finite geometry to mark rails and supports from position and
+              date alone.
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Compare cleaning choices</h3>
+            <p>Test removing structures, predicted wood, both, or neither.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Match the observations</h3>
+            <p>
+              Compare supported 65 cm cubes with field CFR measured on the same
+              date.
+            </p>
+          </article>
+        </div>
+        <p class="caption">
+          The opening point cloud is a display sample, not the data used to
+          calculate the results. Remaining returns are not automatically
+          verified leaves.
+        </p>
+      </section>
+      <section
+        class="results-section"
+        id="results"
+        aria-labelledby="results-title"
+      >
+        <div class="wrap">
+          <div class="section-kicker">02 — THE CURRENT FINDINGS</div>
+          <div class="section-heading">
+            <h2 id="results-title">
+              The relationship<br />depends on the tower.
+            </h2>
+            <p>
+              The strongest pooled association appears at Beech. Douglas is much
+              weaker. Looking within dates changes the picture—and helps
+              separate seasonal patterns from other differences.
+            </p>
+          </div>
+          <div
+            class="tower-overview"
+            aria-label="Results with structures and predicted wood removed"
+          >
+            <article>
+              <span class="small-label">BEECH</span><strong>0.913</strong>
+              <p>Pooled correlation <em>r</em></p>
+              <div class="overview-rule"></div>
+              <span>45 observations · 10 locations</span>
+              <p class="tower-takeaway">
+                A strong pooled association, with substantial differences
+                between individual dates.
+              </p>
+            </article>
+            <article>
+              <span class="small-label">DOUGLAS</span><strong>0.291</strong>
+              <p>Pooled correlation <em>r</em></p>
+              <div class="overview-rule"></div>
+              <span>32 observations · 6 locations</span>
+              <p class="tower-takeaway">
+                A weak, uncertain association that does not track the season
+                consistently.
+              </p>
+            </article>
+            <article>
+              <span class="small-label">MIXED</span><strong>0.611</strong>
+              <p>Pooled correlation <em>r</em></p>
+              <div class="overview-rule"></div>
+              <span>32 observations · 7 locations</span>
+              <p class="tower-takeaway">
+                An association also remains after accounting for differences
+                between dates.
+              </p>
+            </article>
+          </div>
+          <p class="caption">
+            Structures and predicted wood removed · exact-date observations ·
+            Pearson correlation, not prediction accuracy. Repeated dates at a
+            location are not independent trees.
+          </p>
+          <div class="explorer">
+            <div class="explorer-heading">
+              <div>
+                <span class="small-label">EXPLORE THE EVIDENCE</span>
+                <h3>A closer look at each comparison</h3>
+              </div>
+              <a class="text-link" href="./data/observations.csv" download
+                >Download observations <span aria-hidden="true">↓</span></a
+              >
+            </div>
+            <div class="filters">
+              <fieldset>
+                <legend>Tower</legend>
+                <div class="segmented" id="tower-controls">
+                  <button data-tower="Beech" class="active" aria-pressed="true">
+                    Beech</button
+                  ><button data-tower="Douglas" aria-pressed="false">
+                    Douglas</button
+                  ><button data-tower="Mixed" aria-pressed="false">
+                    Mixed
+                  </button>
+                </div>
+              </fieldset>
+              <label
+                >Cleaning<select id="cleaning">
+                  <option value="default_both">
+                    Structures + predicted wood removed
+                  </option>
+                  <option value="baseline">Neither removed (baseline)</option>
+                  <option value="default_structure">Structures removed</option>
+                  <option value="no_wood">Predicted wood removed</option>
+                </select></label
+              >
+            </div>
+            <div class="chart-layout">
+              <div class="chart-area">
+                <h4 id="scatter-title">
+                  Beech · paired field and LiDAR measurements
+                </h4>
+                <div class="chart-wrap">
+                  <svg
+                    id="scatter"
+                    viewBox="0 0 680 460"
+                    role="img"
+                    aria-labelledby="scatter-title scatter-desc"
+                  >
+                    <desc id="scatter-desc">
+                      Loading the 45 Beech observations. Each point is a
+                      sampling location on one date.
+                    </desc>
+                  </svg>
+                  <div id="tooltip" role="status" class="tooltip" hidden></div>
+                </div>
+                <div
+                  class="date-legend"
+                  id="date-legend"
+                  aria-label="Observation dates"
+                ></div>
+                <p class="caption">
+                  One point = one location on one date. Hover, tap or focus a
+                  point for its values. Axes stay fixed across selections.
+                </p>
+              </div>
+              <aside
+                class="chart-summary"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span class="small-label" id="selection-label"
+                  >BEECH · BOTH REMOVED</span
+                >
+                <div class="stat-pair">
+                  <div>
+                    <span>Pooled <em>r</em></span
+                    ><strong id="pooled">0.913</strong>
+                  </div>
+                  <div>
+                    <span>Within-date <em>r</em></span
+                    ><strong id="adjusted">0.597</strong>
+                  </div>
+                </div>
+                <p id="selection-count">
+                  45 observations · 10 locations · 5 dates
+                </p>
+                <p id="interpretation">
+                  The pooled pattern is strong. Removing each date’s mean leaves
+                  a more moderate association.
+                </p>
+                <div class="interval">
+                  <span class="small-label">CONDITIONAL RESAMPLING RANGE</span
+                  ><strong id="range">0.894 to 0.935</strong>
+                  <p>
+                    2.5th–97.5th percentiles for pooled <em>r</em>, resampling
+                    whole location histories. This excludes alignment and model
+                    uncertainty and is not an independent-tree confidence
+                    interval.
+                  </p>
+                </div>
+                <details>
+                  <summary>What does “within-date” mean?</summary>
+                  <p>
+                    We subtract each date’s mean from both signals, then
+                    correlate those residuals. This describes association after
+                    removing date averages. It is not the average of the
+                    per-date correlations or a validated prediction score.
+                  </p>
+                </details>
+              </aside>
+            </div>
+            <p id="data-status" role="status"></p>
+            <details class="table-details">
+              <summary>Inspect the selected observations</summary>
+              <div class="table-scroll">
+                <table>
+                  <caption id="table-caption">
+                    Beech observations
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Location</th>
+                      <th scope="col">Field CFR</th>
+                      <th scope="col">LiDAR ratio</th>
+                      <th scope="col">Returns 1064 / 532 nm</th>
+                    </tr>
+                  </thead>
+                  <tbody id="observation-table"></tbody>
+                </table>
+              </div>
+            </details>
+            <noscript
+              ><p>
+                Interactive comparisons require JavaScript. The headline results
+                above and the downloadable observations and correlations remain
+                available.
+              </p></noscript
+            >
+          </div>
+        </div>
+      </section>
+      <section
+        class="section wrap"
+        id="meaning"
+        aria-labelledby="meaning-title"
+      >
+        <div class="section-kicker">03 — WHAT WE CAN SAY</div>
+        <div class="section-heading">
+          <h2 id="meaning-title">Promising patterns.<br />Open questions.</h2>
+          <p>
+            These results describe the current observations. They are a starting
+            point for testing how reliably laser measurements can represent
+            chlorophyll across different canopies.
+          </p>
+        </div>
+        <div class="limits-grid">
+          <article>
+            <span class="limit-number">01</span>
+            <h3>Season matters</h3>
+            <p>
+              Beech’s pooled correlation is 0.913, but its within-date value is
+              0.597. A strong seasonal pattern does not establish accurate
+              estimates for every location on every date.
+            </p>
+          </article>
+          <article>
+            <span class="limit-number">02</span>
+            <h3>Cleaning needs evidence</h3>
+            <p>
+              At Beech, removing both structures and predicted wood changes
+              pooled <em>r</em> from 0.905 to 0.913. The uncertainty range for
+              that change spans zero; an improvement is not established.
+            </p>
+          </article>
+          <article>
+            <span class="limit-number">03</span>
+            <h3>Validation continues</h3>
+            <p>
+              Independent checks of full-site alignment and material labels
+              remain open. Model-predicted leaves, unmarked returns and
+              fluorescence ratios each need careful interpretation.
+            </p>
+          </article>
+        </div>
+        <div class="scope-note">
+          <span class="small-label">HOW TO READ THIS SNAPSHOT</span>
+          <p>
+            We use supported exact-date observations from 12 March to 18 June
+            2026. Beech contributes five dates; Douglas and Mixed contribute
+            six. The 20 March flight and 26 May field readings are excluded
+            under the current analysis policy. Missing observations stay
+            missing.
+          </p>
+          <p>
+            All four cleaning choices compare the same supported locations and
+            dates within each tower. Reflectance must be finite and within
+            0–100, scanner distance within 15–50 m, with at least five accepted
+            returns in each channel.
+          </p>
+        </div>
+        <details class="methods-details">
+          <summary>Methods, source data and reproducibility</summary>
+          <div>
+            <p>
+              This is the 13 October 2026 exact-date analysis: 109 pairs across
+              23 locations, evaluated in four cleaning states. The source cohort
+              contains 117 candidate exact-date pairs; 109 have common support
+              across all states. The March24/26 date-tolerance sensitivity is
+              separate and is not shown here.
+            </p>
+            <p>
+              Analysis positions use reviewed September GNSS observations, with
+              the approved May FIX observation for Douglas dt24wg. Structure
+              selection uses the dated geometry-only default; wood labels come
+              from existing PointsToWood predictions. Sample support and
+              position uncertainty are not eliminated by cleaning.
+            </p>
+            <p>
+              The source research is maintained in the private LeafH2O
+              repository. The public snapshot includes the rows behind this
+              page, summary coefficients, source hashes, and a real-point
+              display sample. No site statistic is calculated from that display
+              sample.
+            </p>
+            <div class="source-links">
+              <a href="./data/observations.csv" download>Observation table ↗</a
+              ><a href="./data/correlations.csv" download>Correlation table ↗</a
+              ><a href="./data/provenance.json">Provenance record ↗</a
+              ><a href="https://github.com/kgerb/chlorophyll-results"
+                >Website repository ↗</a
+              >
+            </div>
+          </div>
+        </details>
+      </section>
+      <section
+        class="people-section"
+        id="people"
+        aria-labelledby="people-title"
+      >
+        <div class="wrap">
+          <div class="people-heading">
+            <span class="section-kicker">04 — KEEP THE CONVERSATION GOING</span>
+            <h2 id="people-title">
+              Let’s talk about<br /><em>the canopy.</em>
+            </h2>
+            <p>
+              Interested in the measurements, the methods, or a research
+              collaboration? Meet the researchers behind this work.
+            </p>
+          </div>
+          <div class="people">
+            <a href="https://orcid.org/0009-0002-5001-2571" class="person"
+              ><span class="person-initial">KG</span>
+              <div>
+                <h3>Kilian Gerberding</h3>
+                <p>University of Freiburg · Geosense</p>
+                <span>ORCID profile <span aria-hidden="true">↗</span></span>
+              </div></a
+            ><a href="https://orcid.org/0009-0001-9943-2350" class="person"
+              ><span class="person-initial">JS</span>
+              <div>
+                <h3>Jana Seiler</h3>
+                <p>University of Freiburg · INATECH</p>
+                <span>ORCID profile <span aria-hidden="true">↗</span></span>
+              </div></a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap">
+      <div>
+        <a class="brand" href="#">LeafH<span>2</span>O</a>
+        <p>
+          Chlorophyll research, shared openly.<br />Research snapshot · 13
+          October 2026
+        </p>
+      </div>
+      <div class="footer-links">
+        <a
+          href="https://uni-freiburg.de/enr-geosense/research/leafh2o-a-uav-mounted-dual-wavelength-lidar-for-leaf-water-content-retrieval/"
+          >About the LeafH2O project ↗</a
+        ><a href="./data/provenance.json">Sources &amp; provenance ↗</a
+        ><a href="#meaning">Scientific limitations ↑</a>
+      </div>
+      <p class="footer-note">
+        An independent research showcase by the LeafH2O researchers. Preliminary
+        results; no validated chlorophyll prediction is claimed. No analytics or
+        tracking scripts.
+      </p>
+    </footer>
+  </body>
+</html>
