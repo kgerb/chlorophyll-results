@@ -27,7 +27,7 @@ export class CloudScene {
     this.canvas.tabIndex = 0;
     this.canvas.setAttribute(
       "aria-label",
-      "3D point cloud. In inspection mode: drag to rotate, right-drag to pan, wheel or pinch to zoom. Arrow keys rotate, plus and minus zoom, Home resets.",
+      "3D point cloud. Drag to rotate, right-drag or two fingers to pan, wheel or pinch to zoom. Scroll outside the cloud to read on. Arrow keys rotate, plus and minus zoom, Home resets the view.",
     );
     container.append(this.canvas);
     this.scene = new T.Scene();
@@ -39,9 +39,13 @@ export class CloudScene {
     this.controls.minDistance = 0.6;
     this.controls.maxDistance = 180;
     this.controls.enableDamping = false;
-    this.controls.enabled = false;
+    this.controls.dampingFactor = 0.16;
+    this.manual = false;
     this.controls.update();
-    this.controls.addEventListener("change", () => this.render());
+    this.controls.addEventListener("start", () => this.holdView());
+    this.controls.addEventListener("change", () => {
+      if (!this.ticking) this.wake();
+    });
     this.goalPosition = this.camera.position.clone();
     this.goalTarget = this.controls.target.clone();
     this.markers = new T.Group();
@@ -84,15 +88,15 @@ export class CloudScene {
       else if (e.key === "+" || e.key === "=") offset.multiplyScalar(0.88);
       else if (e.key === "-") offset.multiplyScalar(1.12);
       else if (e.key === "Home") {
-        this.camera.position.copy(this.goalPosition);
-        this.controls.target.copy(this.goalTarget);
-        this.controls.update();
+        this.reset();
         e.preventDefault();
         return;
       } else return;
       e.preventDefault();
+      this.holdView();
       this.camera.position.copy(this.controls.target).add(offset);
       this.controls.update();
+      this.render();
     });
     this.canvas.addEventListener("webglcontextlost", (e) => {
       e.preventDefault();
@@ -111,6 +115,10 @@ export class CloudScene {
       this.camera.updateProjectionMatrix();
       this.render();
     }).observe(container);
+    reduced.addEventListener("change", () => {
+      this.controls.enableDamping = this.manual && !reduced.matches;
+      this.wake();
+    });
   }
 
   async load(entry, alignment = false) {
@@ -155,9 +163,7 @@ export class CloudScene {
     const entry = alignment
       ? this.data.alignment
       : tower.clouds.find((x) => x.date === state.date);
-    if (this.cloud) this.cloud.visible = false;
-    this.markers.visible = false;
-    this.render();
+    // Keep the last complete snapshot visible while the next one loads.
     const points = await this.load(entry, alignment);
     if (version !== this.version) return null;
     const positions = [],
@@ -205,7 +211,7 @@ export class CloudScene {
       sizeAttenuation: false,
       vertexColors: true,
       transparent: true,
-      opacity: reduced.matches ? 1 : 0,
+      opacity: reduced.matches ? 1 : 0.35,
     });
     if (this.cloud) {
       this.scene.remove(this.cloud);
@@ -263,12 +269,33 @@ export class CloudScene {
   }
 
   inspect(value) {
-    this.controls.enabled = value;
-    this.canvas.style.touchAction = value ? "none" : "pan-y";
     this.canvas.dataset.inspect = String(value);
-    if (value) cancelAnimationFrame(this.frame);
-    this.frame = null;
-    if (!value) this.wake();
+  }
+
+  holdView() {
+    this.manual = true;
+    this.focusPosition = null;
+    this.controls.enableDamping = !reduced.matches;
+    this.cameraMode();
+  }
+
+  reset() {
+    // Flush any remaining gesture inertia before restoring the guided view.
+    this.controls.enableDamping = false;
+    this.controls.update();
+    this.manual = false;
+    this.focusPosition = null;
+    this.cameraMode();
+    this.wake();
+  }
+
+  cameraMode() {
+    this.canvas.dataset.cameraMode = this.manual ? "manual" : "guided";
+    this.container.dispatchEvent(
+      new CustomEvent("camera-mode", {
+        detail: this.canvas.dataset.cameraMode,
+      }),
+    );
   }
 
   view(pose, progress = 0) {
@@ -280,41 +307,53 @@ export class CloudScene {
       -Math.cos(heading) * pose.range,
       pose.z + pose.range * pose.elevation,
     );
-    if (!this.controls.enabled) this.wake();
+    if (!this.manual) this.wake();
   }
 
   focus(position) {
-    const target = new T.Vector3().fromArray(position);
-    this.camera.position.copy(target).add(new T.Vector3(4, -5, 2));
-    this.controls.target.copy(target);
-    this.controls.update();
+    this.holdView();
+    this.focusTarget = new T.Vector3().fromArray(position);
+    this.focusPosition = this.focusTarget.clone().add(new T.Vector3(4, -5, 2));
+    this.wake();
   }
 
   wake() {
-    if (this.frame) return;
+    if (this.frame || this.ticking) return;
     let previous = performance.now();
     const tick = (now) => {
       this.frame = null;
-      const step = reduced.matches
-        ? 1
-        : 1 - Math.exp(-Math.min(now - previous, 60) / 190);
+      this.ticking = true;
+      const elapsed = Math.min(now - previous, 64);
+      const step = reduced.matches ? 1 : 1 - Math.exp(-elapsed / 260);
       previous = now;
-      if (!this.controls.enabled) {
-        this.camera.position.lerp(this.goalPosition, step);
-        this.controls.target.lerp(this.goalTarget, step);
-        this.controls.update();
+      const destination =
+        this.focusPosition || (!this.manual && this.goalPosition);
+      const target = this.focusPosition ? this.focusTarget : this.goalTarget;
+      let moving = false;
+      if (destination) {
+        this.controls.enableDamping = false;
+        this.camera.position.lerp(destination, step);
+        this.controls.target.lerp(target, step);
+        moving =
+          this.camera.position.distanceTo(destination) > 0.001 ||
+          this.controls.target.distanceTo(target) > 0.001;
+        if (!moving) {
+          this.camera.position.copy(destination);
+          this.controls.target.copy(target);
+          this.focusPosition = null;
+        }
       }
+      this.controls.dampingFactor = 1 - Math.exp(-elapsed / 85);
+      const orbiting = this.controls.update();
+      if (!destination) moving = orbiting;
       if (this.cloud)
         this.cloud.material.opacity = Math.min(
           1,
-          this.cloud.material.opacity + (reduced.matches ? 1 : 0.08),
+          this.cloud.material.opacity + (reduced.matches ? 1 : elapsed / 420),
         );
       this.render();
-      if (
-        (!this.controls.enabled &&
-          this.camera.position.distanceTo(this.goalPosition) > 0.004) ||
-        (this.cloud && this.cloud.material.opacity < 1)
-      )
+      this.ticking = false;
+      if (moving || (this.cloud && this.cloud.material.opacity < 1))
         this.frame = requestAnimationFrame(tick);
     };
     this.frame = requestAnimationFrame(tick);
@@ -323,6 +362,10 @@ export class CloudScene {
   render() {
     this.renderer.render(this.scene, this.camera);
     this.canvas.dataset.camera = this.camera.position
+      .toArray()
+      .map((x) => x.toFixed(3))
+      .join(",");
+    this.canvas.dataset.target = this.controls.target
       .toArray()
       .map((x) => x.toFixed(3))
       .join(",");

@@ -1,3 +1,5 @@
+import { DateTimeline } from "./timeline.js?v=20261013-refined";
+
 const $ = (id) => document.getElementById(id);
 const dateLabel = (date) =>
   new Date(`${date}T12:00:00Z`).toLocaleDateString("en-GB", {
@@ -74,6 +76,7 @@ const cards = [...document.querySelectorAll(".story-step")];
 let active = -1,
   inspecting = false,
   scene,
+  timeline,
   data,
   results,
   state,
@@ -103,6 +106,10 @@ function fillControls() {
   document.querySelectorAll(".inspection-grid select").forEach((el) => {
     el.disabled = state.view === "alignment";
   });
+  timeline.context(
+    tower.clouds.map((c) => c.date),
+    state.view !== "alignment" && (inspecting || active >= 5),
+  );
 }
 
 function legend() {
@@ -148,37 +155,53 @@ function legend() {
 
 async function show() {
   const id = ++revision;
+  const snapshot = { ...state };
   $("scene-status").textContent = "Loading the observed point cloud…";
   $("scene-status").hidden = false;
   $("scene-count").textContent = "Loading the selected view…";
-  $("scene-title").textContent =
-    state.view === "alignment"
-      ? "Beech · five survey dates"
-      : `${state.tower} · ${inspecting ? "free inspection" : definitions[active].label.replace(`${state.tower} · `, "")}`;
-  $("scene-date").textContent =
-    state.view === "alignment"
-      ? `${state.endpoint === "before" ? "Before" : "After"} saved translation · diagnostic`
-      : dateLabel(state.date);
+  $("scene-container").setAttribute("aria-busy", "true");
   $("alignment-controls").hidden = state.view !== "alignment";
-  $("alignment-endpoint").textContent =
-    state.endpoint === "before"
-      ? "Show after translation"
-      : "Show before translation";
-  legend();
   try {
-    const n = await scene.show(state);
-    if (id !== revision || n === null) return;
+    const n = await scene.show(snapshot);
+    if (id !== revision || n === null) return false;
+    $("scene-title").textContent =
+      state.view === "alignment"
+        ? "Beech · five survey dates"
+        : `${state.tower} · ${inspecting ? "free inspection" : definitions[active].label.replace(`${state.tower} · `, "")}`;
+    $("scene-date").textContent =
+      state.view === "alignment"
+        ? `${state.endpoint === "before" ? "Before" : "After"} saved translation · diagnostic`
+        : dateLabel(state.date);
+    $("alignment-endpoint").textContent =
+      state.endpoint === "before"
+        ? "Show after translation"
+        : "Show before translation";
+    legend();
+    timeline.commit(state.date);
+    $("scene-container").setAttribute("aria-busy", "false");
     $("scene-status").hidden = true;
     $("scene-count").textContent =
       `${n.toLocaleString("en-GB")} displayed returns · ${state.view === "alignment" ? "same points at both endpoints" : "sampled, not used for statistics"}`;
     $("inspect-scene").disabled = false;
+    $("reset-scene").disabled = false;
     if ($("scene-sample").value) sampleDetail($("scene-sample").value, false);
+    return true;
   } catch (error) {
-    if (id !== revision) return;
+    if (id !== revision) return false;
+    timeline.pause();
+    $("scene-container").setAttribute("aria-busy", "false");
     $("scene-status").textContent =
       "This 3D view could not be loaded. Try another date or reload. The written story and results remain available.";
     $("scene-count").textContent = "Point-cloud view unavailable";
+    return false;
   }
+}
+
+function chooseDate(date) {
+  state.date = date;
+  $("scene-date-select").value = date;
+  scene.holdView();
+  return show();
 }
 
 function sampleDetail(id, focus = true) {
@@ -236,6 +259,7 @@ function sampleDetail(id, focus = true) {
 }
 
 function chapter(index) {
+  timeline.pause();
   active = index;
   const def = definitions[index];
   cards.forEach((el, i) => el.classList.toggle("is-active", i === index));
@@ -257,7 +281,10 @@ function chapter(index) {
 }
 
 function onScroll() {
-  if (!scene || inspecting) return;
+  if (!scene) return;
+  const bounds = $("walkthrough").getBoundingClientRect();
+  if (bounds.bottom <= 0 || bounds.top >= innerHeight) timeline.pause();
+  if (inspecting) return;
   const mobile = innerWidth <= 850,
     threshold = innerHeight * (mobile ? 0.78 : 0.5);
   let index = 0;
@@ -273,10 +300,10 @@ function onScroll() {
 }
 
 function setInspect(value) {
+  timeline.pause();
   inspecting = value;
   $("walkthrough").classList.toggle("is-inspecting", value);
   $("inspection-controls").hidden = !value;
-  $("reset-scene").hidden = !value;
   $("inspect-scene").textContent = value
     ? "Return to story ↩"
     : "Explore this scene ↗";
@@ -284,9 +311,12 @@ function setInspect(value) {
   scene.inspect(value);
   if (value) {
     state.samples = state.view !== "alignment";
+    const sample = $("scene-sample").value;
     fillControls();
+    $("scene-sample").value = sample;
     show();
   } else {
+    // Restore the chapter's evidence settings, while CloudScene keeps the user's camera.
     chapter(active);
     if (innerWidth <= 850)
       cards[active].scrollIntoView({ behavior: "instant", block: "start" });
@@ -303,12 +333,32 @@ async function start() {
       if (!r.ok) throw Error();
       return r.json();
     }),
-    import("./scene.js"),
+    import("./scene.js?v=20261013-refined"),
   ]);
   [data, results] = values;
   scene = new values[2].CloudScene($("scene-container"), data, (id) =>
     sampleDetail(id),
   );
+  timeline = new DateTimeline($("scene-timeline"), chooseDate);
+  // Reserve the actual control-panel height so the cloud stays directly usable.
+  const fitScene = () => {
+    const visual = document.querySelector(".story-visual");
+    const bottom = document.querySelector(".scene-bottom");
+    visual.style.setProperty(
+      "--scene-bottom-space",
+      `${visual.clientHeight - bottom.offsetTop + 8}px`,
+    );
+  };
+  const layout = new ResizeObserver(fitScene);
+  layout.observe(document.querySelector(".scene-bottom"));
+  layout.observe(document.querySelector(".story-visual"));
+  $("scene-container").addEventListener("camera-mode", (event) => {
+    if (event.detail === "guided") timeline.pause();
+    $("camera-mode").textContent =
+      event.detail === "manual"
+        ? "Your view · reset to follow the story"
+        : "Guided view · drag to make it yours";
+  });
   definitions.forEach((def, i) => {
     const a = document.createElement("a");
     a.href = `#story-${def.key}`;
@@ -334,38 +384,37 @@ async function start() {
   );
   $("inspect-scene").addEventListener("click", () => setInspect(!inspecting));
   $("reset-scene").addEventListener("click", () => {
-    const pose =
-      state.view === "alignment"
-        ? definitions[1].pose
-        : definitions.find((d) => d.key === state.tower.toLowerCase()).pose;
-    scene.view(pose);
-    scene.inspect(false);
-    scene.camera.position.copy(scene.goalPosition);
-    scene.controls.target.copy(scene.goalTarget);
-    scene.controls.update();
-    scene.inspect(true);
+    timeline.pause();
+    scene.reset();
   });
   $("scene-tower").addEventListener("change", () => {
+    timeline.pause();
     state.tower = $("scene-tower").value;
     state.view = undefined;
     state.date = "2026-06-18";
     $("sample-detail").hidden = true;
     fillControls();
-    $("reset-scene").click();
+    scene.view(
+      definitions.find((d) => d.key === state.tower.toLowerCase()).pose,
+    );
     show();
     selectResults();
   });
   [
-    ["scene-date-select", "date"],
     ["scene-channel", "channel"],
     ["scene-cleaning", "cleaning"],
     ["point-size", "pointSize"],
   ].forEach(([id, key]) => {
     $(id).addEventListener("change", () => {
+      timeline.pause();
       state[key] = key === "pointSize" ? Number($(id).value) : $(id).value;
       show();
       if (key === "cleaning") selectResults($("scene-sample").value);
     });
+  });
+  $("scene-date-select").addEventListener("change", () => {
+    timeline.pause();
+    chooseDate($("scene-date-select").value);
   });
   $("scene-sample").addEventListener("change", () =>
     sampleDetail($("scene-sample").value),
@@ -375,9 +424,12 @@ async function start() {
     show();
   });
   $("scene-container").addEventListener("scene-error", (e) => {
+    timeline.pause();
     $("scene-status").hidden = false;
     $("scene-status").textContent = e.detail;
     $("inspect-scene").disabled = true;
+    $("reset-scene").disabled = true;
+    $("play-dates").disabled = true;
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && inspecting) setInspect(false);

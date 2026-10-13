@@ -21,17 +21,29 @@ assets are relative, including deployment under a GitHub project path.
 
 ## The 3D walkthrough
 
-Scroll through the shared workflow and then Beech → Douglas → Mixed. The camera
-follows composed views. **Explore this scene** enables rotate, pan, zoom, dates,
-channels, cleaning choices and clickable sample cubes; **Return to story** (or
-Escape) restores the guided view. Arrow keys rotate, +/− zoom and Home resets.
+Scroll through the shared workflow and then Beech → Douglas → Mixed. Drag to
+rotate, right-drag or use two fingers to pan, and wheel/pinch to zoom directly
+in the story. Scroll outside the cloud to continue reading. Your chosen view
+stays in place across chapters and towers until **Reset view** (or Home).
+**Explore this scene** keeps the expanded dates, channels, cleaning choices
+and sample controls; **Return to story** (or Escape) restores the chapter's
+evidence settings while preserving your camera. Arrow keys rotate and +/− zoom.
 A sample selector provides a keyboard alternative to picking 3D markers.
+
+The visible timeline plays actual available flights: five for Beech and six
+each for Douglas and Mixed. Play/Pause keeps the camera fixed and holds each
+loaded snapshot for two seconds. Playback pauses on chapter/tower changes,
+leaving the walkthrough, hidden pages or a load failure. Dates are separate
+observations: no synthetic intermediate clouds or time interpolation. The last
+complete snapshot stays visible while the next loads, with its original label.
+Rounded controls, damped gestures and time-based camera/fade easing make scene
+changes smoother. Reset returns to the current chapter's composed camera.
 
 The viewer uses locally bundled [Three.js](https://threejs.org/) 0.170.0 and
 OrbitControls under the MIT license (`vendor/THREE-LICENSE.txt`); the package
 source and archive hash are recorded in `vendor/source.json`. No API key or
 external tile service is required. Reduced-motion preferences disable camera
-animation and scroll drift. The written story and result tables remain available
+animation, gesture inertia, fades and scroll drift. The written story and result tables remain available
 when WebGL or point data cannot load. The homepage preview is a capture of the
 actual rendered Beech scene.
 

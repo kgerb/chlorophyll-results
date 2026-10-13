@@ -53,6 +53,27 @@ svg [tabindex]:focus-visible {
 button {
   cursor: pointer;
 }
+button,
+.button {
+  transition:
+    background-color 240ms ease,
+    color 240ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .button:hover,
+  .scene-actions button:hover,
+  #play-dates:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px #0b242522;
+  }
+}
+button:active,
+.button:active {
+  transform: translateY(1px);
+}
 p {
   line-height: 1.65;
   margin: 0 0 1em;
@@ -192,7 +213,7 @@ h2 em {
   color: var(--paper);
   font-size: 13px;
   padding: 17px 21px;
-  border-radius: 2px;
+  border-radius: 999px;
   margin-top: 12px;
 }
 .button:hover {
@@ -449,7 +470,7 @@ h2 {
   gap: 3px;
   background: #eaf0e2;
   padding: 3px;
-  border-radius: 3px;
+  border-radius: 999px;
 }
 .segmented button {
   padding: 10px 21px;
@@ -458,7 +479,7 @@ h2 {
   font-size: 11px;
   min-height: 37px;
   color: var(--muted);
-  border-radius: 2px;
+  border-radius: 999px;
 }
 .segmented button.active {
   background: #304d38;
@@ -1255,6 +1276,7 @@ section[id] {
   }
   * {
     transition: none !important;
+    animation: none !important;
   }
 }
 @media (max-width: 520px) {
