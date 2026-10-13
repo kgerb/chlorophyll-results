@@ -17,6 +17,8 @@
     <link rel="icon" href="./assets/leaf.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="./app.js" defer></script>
+    <script type="module" src="./tour.js"></script>
+    <link rel="stylesheet" href="./tour.css" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -54,8 +56,8 @@
             season across three forest towers. Here is what the current evidence
             shows.
           </p>
-          <a class="button" href="#results"
-            >Explore the findings <span aria-hidden="true">↗</span></a
+          <a class="button" href="#walkthrough"
+            >Step into the canopy <span aria-hidden="true">↗</span></a
           >
           <div class="snapshot">
             <span>RESEARCH SNAPSHOT</span
@@ -63,44 +65,29 @@
             ><span class="preliminary">Preliminary findings</span>
           </div>
         </div>
-        <figure class="canopy-panel">
+        <a
+          class="canopy-panel canopy-preview"
+          href="#walkthrough"
+          aria-label="Enter the 3D canopy walkthrough"
+        >
           <div class="canopy-label">
             <span
-              ><span class="live-dot"></span> A CLOSER LOOK AT THE CANOPY</span
-            ><span>01 / BEECH</span>
+              ><span class="live-dot"></span> STEP INSIDE THE MEASUREMENTS</span
+            ><span>3 TOWERS / 3D</span>
           </div>
-          <canvas
-            id="canopy"
-            role="img"
-            aria-label="Actual sampled LiDAR returns around the Beech tower on 18 June 2026. Orange marks geometry-selected structures, lilac marks predicted wood, and pale green marks remaining returns."
-            tabindex="0"
-          ></canvas>
-          <div class="canopy-loading" id="cloud-status">
-            Loading the real point-cloud sample…
-          </div>
-          <div class="cloud-legend">
-            <span><i class="swatch remaining"></i>Remaining</span
-            ><span><i class="swatch structure"></i>Structure</span
-            ><span><i class="swatch wood"></i>Predicted wood</span>
-          </div>
-          <div
-            class="cloud-controls"
-            role="group"
-            aria-label="Point-cloud cleaning view"
+          <img
+            src="./assets/canopy-preview.jpg"
+            alt="Actual LiDAR returns around the Beech tower, with tower structures in amber and predicted wood in lilac."
+            width="900"
+            height="900"
+          />
+          <span class="preview-cta"
+            >Enter the 3D field story <span aria-hidden="true">↗</span></span
           >
-            <button class="active" data-cloud="all" aria-pressed="true">
-              All returns</button
-            ><button data-cloud="structure" aria-pressed="false">
-              No structures</button
-            ><button data-cloud="both" aria-pressed="false">
-              No structures / wood
-            </button>
-          </div>
-          <figcaption>
-            <span>18 JUN 2026 · 14,000 sampled returns</span
-            ><span>Drag or use ← → to rotate</span>
-          </figcaption>
-        </figure>
+          <span class="preview-caption"
+            >Real sampled returns · guided views + free inspection</span
+          >
+        </a>
       </section>
       <div class="fact-strip wrap" aria-label="Study overview">
         <div>
@@ -173,50 +160,279 @@
             </p>
           </article>
         </div>
-        <div class="workflow" aria-label="Research workflow">
-          <article>
-            <span>01</span>
-            <h3>Bring flights together</h3>
-            <p>
-              Place calibrated surveys in a common frame and inspect their
-              agreement.
+      </section>
+      <section class="tour-intro wrap" aria-labelledby="tour-title">
+        <div class="section-kicker">02 — INSIDE THE POINT CLOUD</div>
+        <h2 id="tour-title">
+          Follow the evidence.<br /><em>One view at a time.</em>
+        </h2>
+        <p>
+          Scroll to follow the workflow, then visit our three towers. Pause
+          anywhere to inspect the real measurements yourself.
+        </p>
+        <a class="text-link" href="#results">Skip to the results ↓</a>
+      </section>
+      <section
+        id="walkthrough"
+        class="walkthrough"
+        aria-label="Guided 3D chlorophyll walkthrough"
+      >
+        <div class="story-visual">
+          <div class="scene-heading">
+            <span class="small-label">LEAFH2O / FIELD EXPLORER</span
+            ><strong id="scene-title">Beech · the survey</strong
+            ><span id="scene-date">18 June 2026</span>
+          </div>
+          <div id="scene-container">
+            <p id="scene-status" role="status">Loading the 3D canopy…</p>
+          </div>
+          <div class="scene-bottom">
+            <div id="scene-legend" class="scene-legend"></div>
+            <p id="scene-count">
+              Real sampled returns · preliminary spatial alignment
             </p>
+            <div class="scene-actions">
+              <button
+                id="inspect-scene"
+                aria-expanded="false"
+                aria-controls="inspection-controls"
+                disabled
+              >
+                Explore this scene ↗</button
+              ><button id="reset-scene" hidden>Reset view</button
+              ><a href="#results">View results ↓</a>
+            </div>
+            <div id="inspection-controls" hidden>
+              <div class="inspection-grid">
+                <label
+                  >Tower<select id="scene-tower">
+                    <option>Beech</option>
+                    <option>Douglas</option>
+                    <option>Mixed</option>
+                  </select></label
+                >
+                <label
+                  >Survey date<select id="scene-date-select"></select
+                ></label>
+                <label
+                  >Colour / channel<select id="scene-channel">
+                    <option value="all">Material labels</option>
+                    <option value="0">1064 nm · reflectance</option>
+                    <option value="2">532 nm · reflectance</option>
+                  </select></label
+                >
+                <label
+                  >Cleaning<select id="scene-cleaning">
+                    <option value="baseline">Neither removed</option>
+                    <option value="default_structure">
+                      Structures removed
+                    </option>
+                    <option value="no_wood">Predicted wood removed</option>
+                    <option value="default_both">Both removed</option>
+                  </select></label
+                >
+                <label
+                  >Sample location<select id="scene-sample">
+                    <option value="">Choose a location</option>
+                  </select></label
+                >
+                <label
+                  >Point size<input
+                    type="range"
+                    id="point-size"
+                    min="1"
+                    max="4"
+                    value="1.5"
+                    step=".25"
+                /></label>
+              </div>
+              <p class="inspection-help">
+                Drag to rotate · right-drag to pan · scroll or pinch to zoom.
+                Keyboard: arrows, + / −, Home. Tap a gold sample marker or
+                select a location.
+                <strong
+                  >Scroll outside the scene to continue down the page.</strong
+                >
+              </p>
+            </div>
+            <div id="alignment-controls" hidden>
+              <button id="alignment-endpoint">Show before translation</button
+              ><span>Same observed returns at two saved positions.</span>
+            </div>
+            <div id="sample-detail" hidden aria-live="polite"></div>
+          </div>
+          <div class="story-progress" aria-hidden="true">
+            <span id="story-progress-fill"></span>
+          </div>
+          <nav id="story-nav" aria-label="Walkthrough chapters"></nav>
+        </div>
+        <div class="story-steps">
+          <article class="story-step" id="story-survey" data-step="survey">
+            <div class="story-card">
+              <span class="small-label">01 / THE SHARED WORKFLOW</span>
+              <h3>A forest, recorded<br />as points.</h3>
+              <p>
+                Each dot is a real laser return. Together they describe the
+                canopy, branches and tower around a sampling site.
+              </p>
+              <p class="story-note">
+                We use a 12 × 12 metre tower crop for these views. The display
+                is sampled for browsing; the results use the full reviewed
+                observation tables.
+              </p>
+            </div>
           </article>
-          <article>
-            <span>02</span>
-            <h3>Identify tower structures</h3>
-            <p>
-              Use finite geometry to mark rails and supports from position and
-              date alone.
-            </p>
+          <article
+            class="story-step"
+            id="story-alignment"
+            data-step="alignment"
+          >
+            <div class="story-card">
+              <span class="small-label">02 / A COMMON FRAME</span>
+              <h3>First, bring<br />the flights together.</h3>
+              <p>
+                Five Beech surveys share this close-up of the upper tower. Each
+                colour is a different flight date.
+              </p>
+              <p class="story-note">
+                Switch between the saved positions before and after translation.
+                These rails helped fit the alignment, so their overlap is a
+                diagnostic—not an independent accuracy test.
+              </p>
+            </div>
           </article>
-          <article>
-            <span>03</span>
-            <h3>Compare cleaning choices</h3>
-            <p>Test removing structures, predicted wood, both, or neither.</p>
+          <article
+            class="story-step"
+            id="story-structures"
+            data-step="structures"
+          >
+            <div class="story-card">
+              <span class="small-label">03 / FIND THE STRUCTURES</span>
+              <h3>
+                The tower belongs<br />in the picture.<br /><em
+                  >Not in the leaf signal.</em
+                >
+              </h3>
+              <p>
+                Amber returns mark tower geometry. As you move on, those returns
+                are removed from the display.
+              </p>
+              <p class="story-note">
+                The mask uses position and date alone. Reflectance does not
+                decide which points belong to the tower.
+              </p>
+            </div>
           </article>
-          <article>
-            <span>04</span>
-            <h3>Match the observations</h3>
-            <p>
-              Compare supported 65 cm cubes with field CFR measured on the same
-              date.
-            </p>
+          <article class="story-step" id="story-wood" data-step="wood">
+            <div class="story-card">
+              <span class="small-label">04 / COMPARE CLEANING</span>
+              <h3>A clearer view<br />of the canopy.</h3>
+              <p>
+                Tower structures are now hidden. Lilac points are predicted
+                wood; the next view removes those too.
+              </p>
+              <p class="story-note">
+                Wood is a model prediction. Surviving returns are not
+                automatically verified leaves. Inspection lets you compare all
+                four cleaning choices.
+              </p>
+            </div>
+          </article>
+          <article class="story-step" id="story-samples" data-step="samples">
+            <div class="story-card">
+              <span class="small-label">05 / MATCH THE MEASUREMENTS</span>
+              <h3>Meet in the<br />same small space.</h3>
+              <p>
+                The gold cubes are 65 cm across, centred on reviewed field
+                locations. We compare a cube’s two-colour laser ratio with field
+                CFR from the same date.
+              </p>
+              <p class="story-note">
+                Explore a sample to see its paired observations. Spectral colour
+                views show only returns within the calibrated reflectance and
+                distance ranges.
+              </p>
+            </div>
+          </article>
+          <article class="story-step" id="story-beech" data-step="beech">
+            <div class="story-card">
+              <span class="small-label">06 / BEECH</span>
+              <h3>A strong seasonal<br /><em>pattern.</em></h3>
+              <p>
+                Beech has the strongest pooled association. Removing each date’s
+                average leaves a more moderate relationship.
+              </p>
+              <p class="story-note">
+                Seasonal co-variation contributes to this pattern. It does not
+                establish a validated chlorophyll prediction.
+              </p>
+              <div class="story-metrics" data-story-metrics="Beech"></div>
+              <a
+                class="story-result-link"
+                href="#results"
+                data-result-tower="Beech"
+                >Explore Beech results ↗</a
+              >
+            </div>
+          </article>
+          <article class="story-step" id="story-douglas" data-step="douglas">
+            <div class="story-card">
+              <span class="small-label">07 / DOUGLAS</span>
+              <h3>A different canopy.<br /><em>A weaker link.</em></h3>
+              <p>
+                At Douglas, the relationship is weak and uncertain. The same
+                approach does not produce the same result everywhere.
+              </p>
+              <p class="story-note">
+                Needle measurements, limited local support and the remaining
+                spatial checks deserve closer attention.
+              </p>
+              <div class="story-metrics" data-story-metrics="Douglas"></div>
+              <a
+                class="story-result-link"
+                href="#results"
+                data-result-tower="Douglas"
+                >Explore Douglas results ↗</a
+              >
+            </div>
+          </article>
+          <article class="story-step" id="story-mixed" data-step="mixed">
+            <div class="story-card">
+              <span class="small-label">08 / MIXED</span>
+              <h3>Another canopy.<br /><em>Another perspective.</em></h3>
+              <p>
+                At Mixed, an association remains after removing date averages.
+                The sampled cohort contains different foliage types.
+              </p>
+              <p class="story-note">
+                Compare all three towers below, including what changes when
+                structures and predicted wood are retained or removed.
+              </p>
+              <div class="story-metrics" data-story-metrics="Mixed"></div>
+              <a
+                class="story-result-link"
+                href="#results"
+                data-result-tower="Mixed"
+                >Explore Mixed results ↗</a
+              >
+            </div>
           </article>
         </div>
-        <p class="caption">
-          The opening point cloud is a display sample, not the data used to
-          calculate the results. Remaining returns are not automatically
-          verified leaves.
-        </p>
       </section>
+      <p class="tour-footnote wrap">
+        3D views are diagnostic display samples, not quantitative density
+        comparisons. Dates are separate observed snapshots; camera transitions
+        do not add measurements. Full-site alignment and independent material
+        validation remain open.
+        <a href="./data/scene.json">View 3D data provenance ↗</a>
+      </p>
       <section
         class="results-section"
         id="results"
         aria-labelledby="results-title"
       >
         <div class="wrap">
-          <div class="section-kicker">02 — THE CURRENT FINDINGS</div>
+          <div class="section-kicker">03 — THE CURRENT FINDINGS</div>
           <div class="section-heading">
             <h2 id="results-title">
               The relationship<br />depends on the tower.
@@ -412,7 +628,7 @@
         id="meaning"
         aria-labelledby="meaning-title"
       >
-        <div class="section-kicker">03 — WHAT WE CAN SAY</div>
+        <div class="section-kicker">04 — WHAT WE CAN SAY</div>
         <div class="section-heading">
           <h2 id="meaning-title">Promising patterns.<br />Open questions.</h2>
           <p>

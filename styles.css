@@ -243,86 +243,6 @@ h2 em {
 .live-dot {
   background: #bbd591;
 }
-.canopy-panel canvas {
-  display: block;
-  width: 100%;
-  height: 350px;
-  cursor: grab;
-  touch-action: pan-y;
-}
-.canopy-panel canvas:active {
-  cursor: grabbing;
-}
-.canopy-loading {
-  position: absolute;
-  top: 45%;
-  left: 20px;
-  right: 20px;
-  font-size: 12px;
-  text-align: center;
-}
-.cloud-legend {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  font-size: 9px;
-  line-height: 1.6;
-  padding: 0 14px 16px;
-  color: #d1dec7;
-}
-.cloud-legend span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.swatch {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-.remaining {
-  background: #b9cfa1;
-}
-.structure {
-  background: #efb35e;
-}
-.wood {
-  background: #c5a8dc;
-}
-.cloud-controls {
-  display: flex;
-  gap: 4px;
-  margin: 0 18px 16px;
-  border: 1px solid #49604e;
-  border-radius: 3px;
-  padding: 4px;
-}
-.cloud-controls button {
-  background: transparent;
-  color: #e0ead2;
-  border: 0;
-  padding: 10px 5px;
-  font-size: 10px;
-  flex: 1;
-  border-radius: 2px;
-  min-height: 38px;
-}
-.cloud-controls button.active {
-  color: #1b3428;
-  background: #dce8b5;
-}
-.canopy-panel figcaption {
-  border-top: 1px solid #3a4e3d;
-  padding: 15px 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 8px;
-  letter-spacing: 0.6px;
-  color: #bdcdb5;
-}
 .fact-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -432,30 +352,6 @@ h2 {
   padding-top: 16px;
   font-size: 11px;
   margin: 0;
-  line-height: 1.7;
-}
-.workflow {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-  margin-top: 46px;
-}
-.workflow article {
-  border-top: 1px solid #a8b99b;
-  padding-top: 18px;
-}
-.workflow article > span {
-  font: italic 21px var(--serif);
-  color: #738563;
-}
-.workflow h3 {
-  font-size: 13px;
-  font-weight: 600;
-  margin: 17px 0 9px;
-}
-.workflow p {
-  font-size: 12px;
-  color: var(--muted);
   line-height: 1.7;
 }
 .caption {
@@ -910,9 +806,6 @@ section[id] {
   scroll-margin-top: 24px;
 }
 @media (min-width: 1450px) {
-  .canopy-panel canvas {
-    height: 400px;
-  }
   .hero {
     padding-block: 70px;
   }
@@ -932,9 +825,6 @@ section[id] {
   }
   .hero h1 {
     font-size: 62px;
-  }
-  .canopy-panel canvas {
-    height: 345px;
   }
   .snapshot {
     gap: 8px;
@@ -1004,20 +894,8 @@ section[id] {
   .snapshot {
     margin-top: 24px;
   }
-  .canopy-panel canvas {
-    height: 360px;
-  }
   .canopy-label {
     font-size: 9px;
-  }
-  .canopy-panel figcaption {
-    font-size: 9px;
-  }
-  .cloud-controls button {
-    font-size: 11px;
-  }
-  .cloud-legend {
-    font-size: 10px;
   }
   .fact-strip {
     grid-template-columns: 1fr 1fr;
@@ -1068,10 +946,6 @@ section[id] {
   }
   .formula-label {
     font-size: 7px;
-  }
-  .workflow {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 35px;
   }
   .tower-overview {
     gap: 25px;
@@ -1194,27 +1068,9 @@ section[id] {
   .hero-detail {
     font-size: 13px;
   }
-  .canopy-panel canvas {
-    height: 320px;
-  }
   .canopy-label {
     padding-inline: 16px;
     font-size: 7px;
-  }
-  .cloud-legend {
-    gap: 12px;
-    font-size: 9px;
-  }
-  .canopy-panel figcaption {
-    font-size: 8px;
-    line-height: 1.5;
-  }
-  .cloud-controls {
-    margin-inline: 12px;
-  }
-  .cloud-controls button {
-    font-size: 9px;
-    padding-inline: 3px;
   }
   .measurement-grid {
     grid-template-columns: 1fr;

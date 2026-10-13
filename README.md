@@ -19,6 +19,27 @@ Open http://localhost:8080. This is a static site with no package installation,
 build step, external scripts, remote fonts or tracking. All paths for local
 assets are relative, including deployment under a GitHub project path.
 
+## The 3D walkthrough
+
+Scroll through the shared workflow and then Beech → Douglas → Mixed. The camera
+follows composed views. **Explore this scene** enables rotate, pan, zoom, dates,
+channels, cleaning choices and clickable sample cubes; **Return to story** (or
+Escape) restores the guided view. Arrow keys rotate, +/− zoom and Home resets.
+A sample selector provides a keyboard alternative to picking 3D markers.
+
+The viewer uses locally bundled [Three.js](https://threejs.org/) 0.170.0 and
+OrbitControls under the MIT license (`vendor/THREE-LICENSE.txt`); the package
+source and archive hash are recorded in `vendor/source.json`. No API key or
+external tile service is required. Reduced-motion preferences disable camera
+animation and scroll drift. The written story and result tables remain available
+when WebGL or point data cannot load. The homepage preview is a capture of the
+actual rendered Beech scene.
+
+Material colours preserve out-of-range reflectance returns. Single-channel
+reflectance colours use a fixed 0–100 scale and require distance 15–50 m.
+Neither this display filter nor the wood prediction changes geometry membership.
+The 3D date/channel controls do not recompute the across-date statistical results.
+
 ## Data and methods
 
 - `data/observations.csv`: 109 exact-date pairs repeated across four cleaning
@@ -26,10 +47,14 @@ assets are relative, including deployment under a GitHub project path.
 - `data/correlations.csv`: pooled and date-adjusted coefficients and conditional
   resampling bounds for every tower/cleaning selection.
 - `data/results.json`: the same reviewed observations and summaries for the UI.
-- `data/canopy.json`: 14,000 uniformly sampled actual June18 Beech display
-  returns in a local metric frame, rounded to 1 mm. Labels encode remaining
-  returns (0), geometry-selected structures (1), or predicted wood outside
-  structures (2). This is not the statistical sample or verified leaf truth.
+- `data/scene.json`: 17 real tower/date display scenes (120,000 returns each),
+  sample positions in tower-local metres, survey provenance and mask/channel
+  counts. The March12 display exists for Douglas and Mixed; Beech starts April7.
+- `data/clouds/`: lazy-loaded point buffers (24 bytes per point), preserving
+  calibrated Reflectance, independent geometry and wood flags, quality flags,
+  channel and source-row identity. These display samples never produce statistics.
+  The separate 40,000-point alignment buffer retains actual before/after positions
+  of the same Beech returns across five dates, not synthetic intermediate scans.
 - `data/provenance.json`: source paths within the private research repository,
   SHA256 hashes, cohort definition, display-sampling seed and limitations.
 

@@ -79,7 +79,7 @@ function mountResults(data) {
         (a, b) =>
           a.date.localeCompare(b.date) || a.sample.localeCompare(b.sample),
       );
-    document.querySelectorAll("[data-tower]").forEach((button) => {
+    document.querySelectorAll("button[data-tower]").forEach((button) => {
       const active = button.dataset.tower === tower;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
@@ -187,6 +187,7 @@ function mountResults(data) {
         stroke: "#fcfdf8",
         "stroke-width": 1,
         class: "point",
+        "data-sample": row.sample,
         tabindex: 0,
         "aria-label": label,
       });
@@ -234,7 +235,7 @@ function mountResults(data) {
       }),
     );
   }
-  document.querySelectorAll("[data-tower]").forEach((button) =>
+  document.querySelectorAll("button[data-tower]").forEach((button) =>
     button.addEventListener("click", () => {
       tower = button.dataset.tower;
       render();
@@ -244,6 +245,20 @@ function mountResults(data) {
   $("cleaning").addEventListener("change", (event) => {
     state = event.target.value;
     render();
+    updateURL();
+  });
+  document.addEventListener("showcase-selection", (event) => {
+    if (Object.hasOwn(data.summaries, event.detail.tower))
+      tower = event.detail.tower;
+    if (Object.hasOwn(stateLabels, event.detail.cleaning))
+      state = event.detail.cleaning;
+    render();
+    if (event.detail.sample)
+      document.querySelectorAll("#scatter .point").forEach((p) => {
+        const selected = p.dataset.sample === event.detail.sample;
+        p.setAttribute("r", selected ? "7" : "4.7");
+        p.setAttribute("fill-opacity", selected ? "1" : ".25");
+      });
     updateURL();
   });
   render();
@@ -257,114 +272,12 @@ function mountResults(data) {
   }).observe($("scatter"));
 }
 
-function mountCanopy(data) {
-  const canvas = $("canopy");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas unavailable");
-  let angle = -0.35;
-  let mode = "all";
-  let drag = null;
-  const points = data.points;
-  const zs = points.map((p) => p[2]);
-  const minZ = Math.min(...zs),
-    maxZ = Math.max(...zs);
-  const middle = (minZ + maxZ) / 2;
-  const radius = Math.max(...points.map((p) => Math.hypot(p[0], p[1])));
-  const colors = ["#b9cfa1", "#efb35e", "#c5a8dc"];
-  function draw() {
-    const { width, height } = canvas.getBoundingClientRect();
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, width, height);
-    const scale = Math.min(
-      (height - 22) / (maxZ - minZ + radius * 0.3),
-      (width - 48) / (radius * 2.2),
-    );
-    const cos = Math.cos(angle),
-      sin = Math.sin(angle);
-    const projected = points
-      .filter(
-        (p) =>
-          mode === "all" || (p[3] !== 1 && (mode !== "both" || p[3] !== 2)),
-      )
-      .map((p) => [
-        p[0] * cos - p[1] * sin,
-        p[0] * sin + p[1] * cos,
-        p[2],
-        p[3],
-      ])
-      .sort((a, b) => a[1] - b[1]);
-    for (const [px, depth, z, label] of projected) {
-      ctx.fillStyle = colors[label];
-      ctx.globalAlpha = label === 0 ? 0.43 + (depth / radius + 1) * 0.13 : 0.95;
-      const size = label === 0 ? 1.35 : 2;
-      ctx.fillRect(
-        width / 2 + px * scale,
-        height / 2 - (z - middle + depth * 0.13) * scale,
-        size,
-        size,
-      );
-    }
-    ctx.globalAlpha = 1;
-    canvas.dataset.visiblePoints = String(projected.length);
-    canvas.dataset.angle = String(angle);
-  }
-  new ResizeObserver(draw).observe(canvas);
-  document.querySelectorAll("[data-cloud]").forEach((button) =>
-    button.addEventListener("click", () => {
-      mode = button.dataset.cloud;
-      document.querySelectorAll("[data-cloud]").forEach((b) => {
-        b.classList.toggle("active", b === button);
-        b.setAttribute("aria-pressed", String(b === button));
-      });
-      draw();
-    }),
-  );
-  canvas.addEventListener("pointerdown", (event) => {
-    drag = event.clientX;
-    canvas.setPointerCapture(event.pointerId);
-  });
-  canvas.addEventListener("pointermove", (event) => {
-    if (drag === null) return;
-    angle += (event.clientX - drag) * 0.009;
-    drag = event.clientX;
-    draw();
-  });
-  ["pointerup", "pointercancel", "lostpointercapture"].forEach((name) =>
-    canvas.addEventListener(name, () => {
-      drag = null;
-    }),
-  );
-  canvas.addEventListener("keydown", (event) => {
-    if (!["ArrowLeft", "ArrowRight", "Home"].includes(event.key)) return;
-    event.preventDefault();
-    angle =
-      event.key === "Home"
-        ? -0.35
-        : angle + (event.key === "ArrowLeft" ? -0.15 : 0.15);
-    draw();
-  });
-  $("cloud-status").hidden = true;
-  draw();
-}
-
 fetchData("./data/results.json")
   .then(mountResults)
   .catch(() => {
     $("data-status").textContent =
       "The interactive data could not be loaded. Reload the page, or use the downloadable tables; the headline snapshot remains visible.";
-    document.querySelectorAll("[data-tower], #cleaning").forEach((control) => {
-      control.disabled = true;
-    });
-  });
-fetchData("./data/canopy.json")
-  .then(mountCanopy)
-  .catch(() => {
-    $("cloud-status").textContent =
-      "The point-cloud sample could not be loaded. The research results below remain available.";
-    document.querySelectorAll("[data-cloud]").forEach((control) => {
+    document.querySelectorAll("button[data-tower], #cleaning").forEach((control) => {
       control.disabled = true;
     });
   });
